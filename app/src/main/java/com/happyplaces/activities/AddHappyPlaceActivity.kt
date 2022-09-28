@@ -45,15 +45,10 @@ import java.util.*
 
 class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
-    /**
-     * An variable to get an instance calendar using the default time zone and locale.
-     */
+
     private var cal = Calendar.getInstance()
 
-    /**
-     * A variable for DatePickerDialog OnDateSetListener.
-     * The listener used to indicate the user has finished selecting a date. Which we will be initialize later on.
-     */
+
     private lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
 
     private var saveImageToInternalStorage: Uri? = null
@@ -65,9 +60,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var mFusedLocationClient: FusedLocationProviderClient // A fused location client variable which is further user to get the user's current location
 
-    /**
-     * This function is auto created by Android when the Activity Class is created.
-     */
+
     override fun onCreate(savedInstanceState: Bundle?) {
         //This call the parent constructor
         super.onCreate(savedInstanceState)
@@ -100,8 +93,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     intent.getSerializableExtra(MainActivity.EXTRA_PLACE_DETAILS) as HappyPlaceModel
         }
 
-        // https://www.tutorialkart.com/kotlin-android/android-datepicker-kotlin-example/
-        // create an OnDateSetListener
+
         dateSetListener =
                 DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
                     cal.set(Calendar.YEAR, year)
@@ -142,9 +134,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             R.id.et_date -> {
                 DatePickerDialog(
                         this@AddHappyPlaceActivity,
-                        dateSetListener, // This is the variable which have created globally and initialized in setupUI method.
-                        // set DatePickerDialog to point to today's date when it loads up
-                        cal.get(Calendar.YEAR), // Here the cal instance is created globally and used everywhere in the class where it is required.
+                        dateSetListener,
+                        cal.get(Calendar.YEAR),
                         cal.get(Calendar.MONTH),
                         cal.get(Calendar.DAY_OF_MONTH)
                 ).show()
@@ -159,7 +150,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                         pictureDialogItems
                 ) { dialog, which ->
                     when (which) {
-                        // Here we have create the methods for image selection from GALLERY
+
                         0 -> choosePhotoFromGallery()
                         1 -> takePhotoFromCamera()
                     }
@@ -169,12 +160,12 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
             R.id.et_location -> {
                 try {
-                    // These are the list of fields which we required is passed
+
                     val fields = listOf(
                             Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
                             Place.Field.ADDRESS
                     )
-                    // Start the autocomplete intent with a unique request code.
+
                     val intent =
                             Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
                                     .build(this@AddHappyPlaceActivity)
@@ -193,13 +184,11 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    // This will redirect you to settings from where you need to turn on the location provider.
+
                     val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     startActivity(intent)
                 } else {
-                    // For Getting current location of user please have a look at below link for better understanding
-                    // https://www.androdocs.com/kotlin/getting-current-location-latitude-longitude-in-android-using-kotlin.html
-                    Dexter.withActivity(this)
+                     Dexter.withActivity(this)
                         .withPermissions(
                             Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -242,7 +231,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     else -> {
 
-                        // Assigning all the values to data model class.
+
                         val happyPlaceModel = HappyPlaceModel(
                                 if (mHappyPlaceDetails == null) 0 else mHappyPlaceDetails!!.id,
                                 et_title.text.toString(),
@@ -254,7 +243,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                                 mLongitude
                         )
 
-                        // Here we initialize the database handler class.
+
                         val dbHandler = DatabaseHandler(this)
 
                         if (mHappyPlaceDetails == null) {
@@ -278,20 +267,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * Receive the result from a previous call to
-     * {@link #startActivityForResult(Intent, int)}.  This follows the
-     * related Activity API as described there in
-     * {@link Activity#onActivityResult(int, int, Intent)}.
-     *
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing you to identify who this
-     *                    result came from.
-     * @param resultCode The integer result code returned by the child activity
-     *                   through its setResult().
-     * @param data An Intent, which can return result data to the caller
-     *               (various data can be attached to Intent "extras").
-     */
+
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -299,7 +275,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 if (data != null) {
                     val contentURI = data.data
                     try {
-                        // Here this is used to get an bitmap from URI
+
                         @Suppress("DEPRECATION")
                         val selectedImageBitmap =
                                 MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
@@ -308,7 +284,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                                 saveImageToInternalStorage(selectedImageBitmap)
                         Log.e("Saved Image : ", "Path :: $saveImageToInternalStorage")
 
-                        iv_place_image!!.setImageBitmap(selectedImageBitmap) // Set the selected image from GALLERY to imageView.
+                        iv_place_image!!.setImageBitmap(selectedImageBitmap)
                     } catch (e: IOException) {
                         e.printStackTrace()
                         Toast.makeText(this@AddHappyPlaceActivity, "Failed!", Toast.LENGTH_SHORT)
@@ -317,13 +293,13 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 }
             } else if (requestCode == CAMERA) {
 
-                val thumbnail: Bitmap = data!!.extras!!.get("data") as Bitmap // Bitmap from camera
+                val thumbnail: Bitmap = data!!.extras!!.get("data") as Bitmap
 
                 saveImageToInternalStorage =
                         saveImageToInternalStorage(thumbnail)
                 Log.e("Saved Image : ", "Path :: $saveImageToInternalStorage")
 
-                iv_place_image!!.setImageBitmap(thumbnail) // Set to the imageView.
+                iv_place_image!!.setImageBitmap(thumbnail)
             }
             else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
 
@@ -339,18 +315,15 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * A function to update the selected date in the UI with selected format.
-     * This function is created because every time we don't need to add format which we have added here to show it in the UI.
-     */
+
     private fun updateDateInView() {
-        val myFormat = "dd.MM.yyyy" // mention the format you need
-        val sdf = SimpleDateFormat(myFormat, Locale.getDefault()) // A date format
-        et_date.setText(sdf.format(cal.time).toString()) // A selected date using format which we have used is set to the UI.
+        val myFormat = "dd.MM.yyyy"
+        val sdf = SimpleDateFormat(myFormat, Locale.getDefault())
+        et_date.setText(sdf.format(cal.time).toString())
     }
 
     /**
-     * A method is used for image selection from GALLERY / PHOTOS of phone storage.
+     *
      */
     private fun choosePhotoFromGallery() {
         Dexter.withActivity(this)
@@ -361,7 +334,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
 
-                        // Here after all the permission are granted launch the gallery to select and image.
+
                         if (report!!.areAllPermissionsGranted()) {
 
                             val galleryIntent = Intent(
@@ -384,7 +357,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     /**
-     * A method is used  asking the permission for camera and storage and image capturing and selection from Camera.
+     *
      */
     private fun takePhotoFromCamera() {
 
@@ -396,7 +369,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 )
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                        // Here after all the permission are granted launch the CAMERA to capture an image.
+
                         if (report!!.areAllPermissionsGranted()) {
                             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                             startActivityForResult(intent, CAMERA)
@@ -414,7 +387,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     /**
-     * A function used to show the alert dialog when the permissions are denied and need to allow it from settings app info.
+     *
      */
     private fun showRationalDialogForPermissions() {
         AlertDialog.Builder(this)
@@ -437,22 +410,11 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 }.show()
     }
 
-    /**
-     * A function to save a copy of an image to internal storage for HappyPlaceApp to use.
-     */
     private fun saveImageToInternalStorage(bitmap: Bitmap): Uri {
 
-        // Get the context wrapper instance
+
         val wrapper = ContextWrapper(applicationContext)
 
-        // Initializing a new file
-        // The bellow line return a directory in internal storage
-        /**
-         * The Mode Private here is
-         * File creation mode: the default mode, where the created file can only
-         * be accessed by the calling application (or all applications sharing the
-         * same user ID).
-         */
         var file = wrapper.getDir(IMAGE_DIRECTORY, Context.MODE_PRIVATE)
 
         // Create a file to save the image
@@ -478,9 +440,6 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         return Uri.parse(file.absolutePath)
     }
 
-    /**
-     * A function which is used to verify that the location or let's GPS is enable or not of the user's device.
-     */
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager =
             getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -489,9 +448,6 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         )
     }
 
-    /**
-     * A function to request the current location. Using the fused location provider client.
-     */
     @SuppressLint("MissingPermission")
     private fun requestNewLocationData() {
 
@@ -508,9 +464,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         )
     }
 
-    /**
-     * A location callback object of fused location provider client where we will get the current location details.
-     */
+
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             val mLastLocation: Location = locationResult.lastLocation

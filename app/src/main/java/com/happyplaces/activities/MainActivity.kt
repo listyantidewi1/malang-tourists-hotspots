@@ -53,9 +53,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * A function to get the list of happy place from local database.
-     */
+
     private fun getHappyPlacesListFromLocalDB() {
 
         val dbHandler = DatabaseHandler(this)
@@ -72,9 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * A function to populate the recyclerview to the UI.
-     */
+
     private fun setupHappyPlacesRecyclerView(happyPlacesList: ArrayList<HappyPlaceModel>) {
 
         rv_happy_places_list.layoutManager = LinearLayoutManager(this)
@@ -110,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                 val adapter = rv_happy_places_list.adapter as HappyPlacesAdapter
                 adapter.removeAt(viewHolder.adapterPosition)
 
-                getHappyPlacesListFromLocalDB() // Gets the latest list from the local database after item being delete from it.
+                getHappyPlacesListFromLocalDB()
             }
         }
         val deleteItemTouchHelper = ItemTouchHelper(deleteSwipeHandler)
